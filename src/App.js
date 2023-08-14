@@ -3,7 +3,9 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Cylinder } from '@react-three/drei';
 import { MeshPhysicalMaterial } from 'three';
 
-function Gauge({ height, capHeight = 0.2, score }) {
+import cylinderSVG from "./assets/cylinder.svg";
+
+function Gauge({ height, capHeight, score }) {
   const liquid = useRef();
   
   // Max liquid height is height - capHeight * 2
@@ -20,23 +22,9 @@ function Gauge({ height, capHeight = 0.2, score }) {
     liquid.current.position.y = -height / 2 + capHeight + (liquidLevel / 2);
   });
 
-  // Create a reflective material for the glass
-  const glassMaterial = new MeshPhysicalMaterial({
-    color: "white",
-    emissive: "black",
-    transparent: true,
-    opacity: 0.3,
-    metalness: 0.5,
-    reflectivity: 1,
-    roughness: 1,
-    clearcoat: 1,
-    clearcoatRoughness: 1,
-  });
-
   // Liquid material with a shiny appearance
   const liquidMaterial = new MeshPhysicalMaterial({
     color: "green",
-    emissive: "black",
     reflectivity: 1,
     roughness: 1,
     clearcoat: 1,
@@ -45,39 +33,26 @@ function Gauge({ height, capHeight = 0.2, score }) {
 
   return (
     <group position={[0, 0, 0]}>
-      {/* Gauge Shell */}
-      <Cylinder args={[1, 1, height, 64]}>
-        <primitive object={glassMaterial} attach="material" />
-      </Cylinder>
-
-      {/* Gauge Bottom Cap */}
-      <Cylinder position={[0, -height / 2, 0]} args={[1, 1, capHeight, 64]}>
-        <meshStandardMaterial attach="material" color="gray" />
-      </Cylinder>
-
-      {/* Gauge Top Cap */}
-      <Cylinder position={[0, height / 2, 0]} args={[1, 1, capHeight, 64]}>
-        <meshStandardMaterial attach="material" color="gray" />
-      </Cylinder>
-
       {/* Gauge Liquid */}
-      <Cylinder ref={liquid} args={[0.9, 0.9, maxLiquidHeight, 64]} position={[0, -height / 2 + maxLiquidHeight / 2 + capHeight, 0]}>
+      <Cylinder ref={liquid} args={[0.88, 0.93, maxLiquidHeight, 64]} position={[0, -height / 1.5 + maxLiquidHeight / 1.5 + capHeight, 0]}>
         <primitive object={liquidMaterial} attach="material" />
       </Cylinder>
     </group>
   );
 }
 
-export default function App() {
+export default function CylinderGauge() {
   return (
-    <div className="w-[300px] h-[500px]">
-      <Canvas
-        camera={{ position: [0, 5, 12], fov: 40 }}
-      >
-        <ambientLight intensity={5} />
-        {/* <pointLight position={[10, 10, 10]} /> */}
-        <Gauge height={5} score={5} />
-      </Canvas>
+    <div className="relative w-[300px] h-[450px]">
+      <div className="absolute w-full h-full">
+        <Canvas
+          camera={{ position: [0, 5, 20], fov: 20 }}
+        >
+          <ambientLight intensity={5} />
+          <Gauge height={7} capHeight={0.5} score={10} />
+        </Canvas>
+      </div>
+      <img src={cylinderSVG} alt="Cylinder Gauge" className="absolute w-full h-full z-10" />
     </div>
   );
 }
